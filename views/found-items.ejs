@@ -1,0 +1,107 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1>Found Items</h1>
+      <% if (locals.user) { %>
+        <a href="/found-items/new/item" class="btn btn-success">
+          <i class="fas fa-plus-circle me-2"></i> Report Found Item
+        </a>
+      <% } %>
+    </div>
+    <p class="lead">Browse items that have been found on campus and are waiting to be claimed.</p>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-8 col-lg-6 mx-auto">
+    <form class="search-form" data-results="searchResults" data-url="/api/found-items/search">
+      <div class="input-group">
+        <input type="text" class="form-control" name="query" placeholder="Search found items...">
+        <button class="btn btn-success" type="submit">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="searchResults" class="row" style="display: none;">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Search Results</h5>
+      </div>
+      <div class="card-body" id="searchResultsContent">
+        <!-- Search results will appear here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" id="foundItemsContainer">
+  <% if (foundItems && foundItems.length > 0) { %>
+    <% foundItems.forEach(item => { %>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 item-card">
+          <% if (item.image_url) { %>
+            <img src="<%= item.image_url %>" class="card-img-top item-image" alt="<%= item.item_name %>">
+          <% } %>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <h5 class="card-title"><%= item.item_name %></h5>
+              <span class="badge bg-secondary category-badge"><%= item.category %></span>
+            </div>
+            <p class="card-text"><%= item.description || 'No description provided.' %></p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <small class="text-muted">Found on: <%= new Date(item.date_found).toLocaleDateString() %></small>
+              <small class="text-muted">Location: <%= item.location_found %></small>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge rounded-pill 
+                  <% if (item.status === 'unclaimed') { %>bg-info<% } 
+                  else if (item.status === 'claimed') { %>bg-success<% } 
+                  else { %>bg-secondary<% } %>">
+                  <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                </span>
+              </div>
+              <div>
+                <a href="/found-items/<%= item.found_item_id %>" class="btn btn-sm btn-success">View Details</a>
+                <% if (item.status === 'unclaimed' && locals.user && user.role !== 'admin') { %>
+                  <a href="/found-items/<%= item.found_item_id %>" class="btn btn-sm btn-primary">
+                    <i class="fas fa-hand-holding me-1"></i> Claim
+                  </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  <% } else { %>
+    <div class="col-12 text-center py-5">
+      <div class="py-5">
+        <i class="fas fa-box-open fa-4x mb-4 text-muted"></i>
+        <h3>No Found Items Available</h3>
+        <p class="text-muted">Be the first to report a found item.</p>
+        <% if (locals.user) { %>
+          <a href="/found-items/new/item" class="btn btn-success mt-3">
+            <i class="fas fa-plus-circle me-2"></i> Report Found Item
+          </a>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>
+
+<script>
+  // Show search results when search is performed
+  document.querySelector('.search-form').addEventListener('submit', function() {
+    document.getElementById('searchResults').style.display = 'block';
+    document.getElementById('foundItemsContainer').style.display = 'none';
+  });
+</script>
+
+<%- include('partials/footer') %> 

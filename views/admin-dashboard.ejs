@@ -1,0 +1,162 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <h1>Admin Dashboard</h1>
+    <p class="lead">Welcome, <%= user.email %>! Manage your campus lost and found system here.</p>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-3 mb-4">
+    <div class="card bg-primary text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title">Lost Items</h5>
+            <h1 class="display-4"><%= stats.lostItemCount %></h1>
+          </div>
+          <i class="fas fa-search fa-3x"></i>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="/admin/lost-items" class="text-white">View Details</a>
+        <i class="fas fa-arrow-circle-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card bg-success text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title">Found Items</h5>
+            <h1 class="display-4"><%= stats.foundItemCount %></h1>
+          </div>
+          <i class="fas fa-box-open fa-3x"></i>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="/admin/found-items" class="text-white">View Details</a>
+        <i class="fas fa-arrow-circle-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card bg-warning text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title">Pending Claims</h5>
+            <h1 class="display-4"><%= stats.pendingClaimCount %></h1>
+          </div>
+          <i class="fas fa-clipboard-check fa-3x"></i>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="/admin/claims" class="text-white">View Details</a>
+        <i class="fas fa-arrow-circle-right"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card bg-info text-white h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="card-title">Users</h5>
+            <h1 class="display-4"><%= stats.userCount %></h1>
+          </div>
+          <i class="fas fa-users fa-3x"></i>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="/admin/users" class="text-white">View Details</a>
+        <i class="fas fa-arrow-circle-right"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Recent Claims</h4>
+        <a href="/admin/claims" class="btn btn-sm btn-outline-light">View All</a>
+      </div>
+      <div class="card-body">
+        <% if (recentClaims && recentClaims.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Claimant</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentClaims.forEach(claim => { %>
+                  <tr>
+                    <td>#<%= claim.claim_id %></td>
+                    <td>
+                      <% if (claim.lost_item_name) { %>
+                        <span class="badge bg-danger">Lost</span> <%= claim.lost_item_name %>
+                      <% } else if (claim.found_item_name) { %>
+                        <span class="badge bg-success">Found</span> <%= claim.found_item_name %>
+                      <% } %>
+                    </td>
+                    <td><%= claim.user_name || claim.claimed_by %></td>
+                    <td><%= new Date(claim.claim_date).toLocaleDateString() %></td>
+                    <td>
+                      <span class="badge rounded-pill 
+                        <% if (claim.status === 'pending') { %>bg-warning<% } 
+                        else if (claim.status === 'approved') { %>bg-success<% }
+                        else if (claim.status === 'rejected') { %>bg-danger<% }
+                        else { %>bg-secondary<% } %>">
+                        <%= claim.status.charAt(0).toUpperCase() + claim.status.slice(1) %>
+                      </span>
+                    </td>
+                    <td>
+                      <a href="/claims/<%= claim.claim_id %>" class="btn btn-sm btn-primary">View</a>
+                      
+                      <% if (claim.status === 'pending') { %>
+                        <div class="btn-group" role="group">
+                          <form action="/claims/<%= claim.claim_id %>/approve" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success">
+                              <i class="fas fa-check"></i>
+                            </button>
+                          </form>
+                          <form action="/claims/<%= claim.claim_id %>/reject" method="POST" class="d-inline ms-1">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </form>
+                        </div>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="text-center py-4">
+            <i class="fas fa-clipboard-check fa-3x mb-3 text-muted"></i>
+            <h3>No Pending Claims</h3>
+            <p class="text-muted">All claims have been processed.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %> 

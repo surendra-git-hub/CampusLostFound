@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <h1>Report Lost Item</h1>
+    <p class="lead">Fill out the form below to report an item you've lost on campus.</p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <form action="/lost-items" method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="item_name" class="form-label">Item Name*</label>
+            <input type="text" class="form-control" id="item_name" name="item_name" required>
+            <div class="invalid-feedback">Please provide an item name.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="category" class="form-label">Category*</label>
+            <select class="form-select" id="category" name="category" required>
+              <option value="" selected disabled>Select a category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Books">Books</option>
+              <option value="ID Cards">ID Cards</option>
+              <option value="Keys">Keys</option>
+              <option value="Wallet">Wallet</option>
+              <option value="Bags">Bags</option>
+              <option value="Jewelry">Jewelry</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe your item in detail, including color, brand, distinguishing features, etc."></textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="date_lost" class="form-label">Date Lost*</label>
+              <input type="date" class="form-control" id="date_lost" name="date_lost" required max="<%= new Date().toISOString().split('T')[0] %>">
+              <div class="invalid-feedback">Please provide the date when you lost the item.</div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="location_lost" class="form-label">Location Lost*</label>
+              <input type="text" class="form-control" id="location_lost" name="location_lost" required placeholder="e.g., Library, Cafeteria, Dormitory">
+              <div class="invalid-feedback">Please provide where you lost the item.</div>
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <a href="/users/dashboard" class="btn btn-outline-secondary me-md-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">Submit Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set max date to today
+  document.getElementById('date_lost').max = new Date().toISOString().split('T')[0];
+  
+  // Initialize form validation
+  (function() {
+    'use strict';
+    
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    Array.prototype.slice.call(forms).forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+
+<%- include('partials/footer') %> 

@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Admin Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Admin Profile</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Admin Profile</h4>
+      </div>
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <div class="profile-avatar bg-primary text-white">
+            <i class="fas fa-user-shield fa-3x"></i>
+          </div>
+          <h3 class="mt-3"><%= adminProfile.name %></h3>
+          <p class="text-muted">System Administrator</p>
+        </div>
+        
+        <form action="/admin/profile" method="POST" class="needs-validation" novalidate>
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" class="form-control" id="name" name="name" value="<%= adminProfile.name %>" required>
+              <div class="invalid-feedback">Name is required.</div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" value="<%= adminProfile.email %>" required>
+              <div class="invalid-feedback">Please provide a valid email.</div>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input type="text" class="form-control" id="username" value="<%= adminProfile.username %>" readonly>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="phone_number" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="phone_number" name="phone_number" value="<%= adminProfile.phone_number || '' %>">
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          <h5>Change Password</h5>
+          
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+              <label for="current_password" class="form-label">Current Password</label>
+              <input type="password" class="form-control" id="current_password" name="current_password">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="new_password" class="form-label">New Password</label>
+              <input type="password" class="form-control" id="new_password" name="new_password">
+            </div>
+          </div>
+          
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <a href="/admin/dashboard" class="btn btn-outline-secondary me-md-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+</style>
+
+<%- include('partials/footer') %> 

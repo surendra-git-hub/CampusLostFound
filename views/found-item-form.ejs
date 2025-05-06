@@ -1,0 +1,116 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <h1>Report Found Item</h1>
+    <p class="lead">Fill out the form below to report an item you've found on campus.</p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-body p-4">
+        <form action="/found-items" method="POST" class="needs-validation" enctype="multipart/form-data" novalidate>
+          <div class="mb-3">
+            <label for="item_name" class="form-label">Item Name*</label>
+            <input type="text" class="form-control" id="item_name" name="item_name" required>
+            <div class="invalid-feedback">Please provide an item name.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="category" class="form-label">Category*</label>
+            <select class="form-select" id="category" name="category" required>
+              <option value="" selected disabled>Select a category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Books">Books</option>
+              <option value="ID Cards">ID Cards</option>
+              <option value="Keys">Keys</option>
+              <option value="Wallet">Wallet</option>
+              <option value="Bags">Bags</option>
+              <option value="Jewelry">Jewelry</option>
+              <option value="Other">Other</option>
+            </select>
+            <div class="invalid-feedback">Please select a category.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe the item in detail, including color, brand, distinguishing features, etc."></textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="date_found" class="form-label">Date Found*</label>
+              <input type="date" class="form-control" id="date_found" name="date_found" required max="<%= new Date().toISOString().split('T')[0] %>">
+              <div class="invalid-feedback">Please provide the date when you found the item.</div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label for="location_found" class="form-label">Location Found*</label>
+              <input type="text" class="form-control" id="location_found" name="location_found" required placeholder="e.g., Library, Cafeteria, Dormitory">
+              <div class="invalid-feedback">Please provide where you found the item.</div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="image" class="form-label">Upload Image</label>
+            <input type="file" class="form-control" id="image" name="image" accept="image/*" data-preview="imagePreview">
+            <div class="form-text">Upload a clear image of the item. Max file size: 5MB.</div>
+            <img id="imagePreview" class="mt-2 img-thumbnail" style="max-height: 200px; display: none;">
+          </div>
+          
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <a href="/users/dashboard" class="btn btn-outline-secondary me-md-2">Cancel</a>
+            <button type="submit" class="btn btn-success">Submit Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set max date to today
+  document.getElementById('date_found').max = new Date().toISOString().split('T')[0];
+  
+  // Initialize form validation
+  (function() {
+    'use strict';
+    
+    var forms = document.querySelectorAll('.needs-validation');
+    
+    Array.prototype.slice.call(forms).forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+  
+  // Image preview
+  document.getElementById('image').addEventListener('change', function() {
+    const preview = document.getElementById('imagePreview');
+    
+    if (this.files && this.files[0]) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      
+      reader.readAsDataURL(this.files[0]);
+    } else {
+      preview.src = '';
+      preview.style.display = 'none';
+    }
+  });
+</script>
+
+<%- include('partials/footer') %> 

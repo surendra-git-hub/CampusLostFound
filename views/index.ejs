@@ -1,0 +1,154 @@
+<%- include('partials/header') %>
+
+<section class="hero-section bg-light p-5 mb-5 rounded">
+  <div class="row">
+    <div class="col-md-6">
+      <h1 class="display-4">Welcome to Campus Lost & Found</h1>
+      <p class="lead">The easiest way to find your lost items or report found ones within the campus community.</p>
+      <hr class="my-4">
+      <p>Join our platform to connect with people who might have found your lost belongings or to help others find their items.</p>
+      <div class="d-flex gap-2">
+        <a href="/lost-items" class="btn btn-primary">View Lost Items</a>
+        <a href="/found-items" class="btn btn-success">View Found Items</a>
+        <% if (!locals.user) { %>
+          <a href="/auth/register" class="btn btn-outline-dark">Register Now</a>
+        <% } else { %>
+          <% if (user.role !== 'admin') { %>
+            <a href="/lost-items/new/item" class="btn btn-outline-danger">Report Lost Item</a>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+    <div class="col-md-6 d-flex align-items-center">
+      <img src="https://via.placeholder.com/500x300?text=Lost+and+Found" alt="Lost and Found" class="img-fluid rounded">
+    </div>
+  </div>
+</section>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Lost Items</h5>
+        <a href="/lost-items" class="btn btn-sm btn-outline-light">View All</a>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush" id="recentLostItems">
+          <!-- This will be populated by server-side data -->
+          <p class="text-center text-muted">Loading recent lost items...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Found Items</h5>
+        <a href="/found-items" class="btn btn-sm btn-outline-light">View All</a>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush" id="recentFoundItems">
+          <!-- This will be populated by server-side data -->
+          <p class="text-center text-muted">Loading recent found items...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="how-it-works bg-light p-4 rounded mb-4">
+  <h2 class="text-center mb-4">How It Works</h2>
+  <div class="row text-center">
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+          <h4>Report Lost or Found Item</h4>
+          <p>Create a detailed report of your lost item or an item you've found on campus.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <i class="fas fa-exchange-alt fa-3x mb-3 text-primary"></i>
+          <h4>Connect & Verify</h4>
+          <p>Our system helps connect people who lost items with those who found them.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <i class="fas fa-check-circle fa-3x mb-3 text-primary"></i>
+          <h4>Claim & Recover</h4>
+          <p>Verify ownership, arrange a pickup, and recover your lost belongings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Fetch and display recent lost items
+  fetch('/api/lost-items/recent')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('recentLostItems');
+      container.innerHTML = '';
+      
+      if (data.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No lost items reported yet.</p>';
+        return;
+      }
+      
+      data.forEach(item => {
+        container.innerHTML += `
+          <a href="/lost-items/${item.lost_item_id}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">${item.item_name}</h6>
+              <small>${new Date(item.date_lost).toLocaleDateString()}</small>
+            </div>
+            <p class="mb-1 text-truncate">${item.description || 'No description provided'}</p>
+            <small>Category: ${item.category}</small>
+          </a>
+        `;
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching lost items:', error);
+      document.getElementById('recentLostItems').innerHTML = '<p class="text-center text-danger">Failed to load lost items.</p>';
+    });
+  
+  // Fetch and display recent found items
+  fetch('/api/found-items/recent')
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById('recentFoundItems');
+      container.innerHTML = '';
+      
+      if (data.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No found items reported yet.</p>';
+        return;
+      }
+      
+      data.forEach(item => {
+        container.innerHTML += `
+          <a href="/found-items/${item.found_item_id}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">${item.item_name}</h6>
+              <small>${new Date(item.date_found).toLocaleDateString()}</small>
+            </div>
+            <p class="mb-1 text-truncate">${item.description || 'No description provided'}</p>
+            <small>Category: ${item.category}</small>
+          </a>
+        `;
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching found items:', error);
+      document.getElementById('recentFoundItems').innerHTML = '<p class="text-center text-danger">Failed to load found items.</p>';
+    });
+</script>
+
+<%- include('partials/footer') %> 

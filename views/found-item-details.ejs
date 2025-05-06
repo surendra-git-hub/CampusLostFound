@@ -1,0 +1,187 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/found-items">Found Items</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= foundItem.item_name %></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><%= foundItem.item_name %></h4>
+      </div>
+      <% if (foundItem.image_url) { %>
+        <img src="<%= foundItem.image_url %>" class="card-img-top" alt="<%= foundItem.item_name %>">
+      <% } %>
+      <div class="card-body">
+        <div class="mb-4">
+          <span class="badge rounded-pill 
+            <% if (foundItem.status === 'unclaimed') { %>bg-info<% } 
+            else if (foundItem.status === 'claimed') { %>bg-success<% } 
+            else { %>bg-secondary<% } %>">
+            Status: <%= foundItem.status.charAt(0).toUpperCase() + foundItem.status.slice(1) %>
+          </span>
+          <span class="badge bg-secondary ms-2"><%= foundItem.category %></span>
+        </div>
+        
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th style="width: 150px;">Description</th>
+              <td><%= foundItem.description || 'No description provided.' %></td>
+            </tr>
+            <tr>
+              <th>Date Found</th>
+              <td><%= new Date(foundItem.date_found).toLocaleDateString() %></td>
+            </tr>
+            <tr>
+              <th>Location</th>
+              <td><%= foundItem.location_found %></td>
+            </tr>
+            <% if (foundItem.finder_name) { %>
+            <tr>
+              <th>Found By</th>
+              <td><%= foundItem.finder_name %></td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+        
+        <% if (foundItem.status === 'unclaimed') { %>
+          <div class="mt-4">
+            <% if (locals.user && user.role !== 'admin') { %>
+              <!-- Claim button for regular users -->
+              <button type="button" class="btn btn-primary btn-lg w-100" data-bs-toggle="modal" data-bs-target="#claimModal">
+                <i class="fas fa-hand-holding me-2"></i> This is My Item - Claim Now
+              </button>
+            <% } else if (locals.user && user.role === 'admin') { %>
+              <!-- Admin controls -->
+              <div class="d-flex gap-2">
+                <a href="/admin/found-items" class="btn btn-secondary">
+                  <i class="fas fa-arrow-left me-2"></i> Back to Found Items
+                </a>
+                <a href="/found-items/<%= foundItem.found_item_id %>/edit" class="btn btn-warning">
+                  <i class="fas fa-edit me-2"></i> Edit
+                </a>
+              </div>
+            <% } else { %>
+              <!-- For non-logged in users -->
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> Please <a href="/auth/login">login</a> to claim this item.
+              </div>
+            <% } %>
+          </div>
+        <% } else if (foundItem.status === 'claimed') { %>
+          <div class="alert alert-success mt-4">
+            <i class="fas fa-check-circle me-2"></i> This item has already been claimed.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-5">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Similar Lost Items</h5>
+      </div>
+      <div class="card-body matched-items">
+        <% if (similarLostItems && similarLostItems.length > 0) { %>
+          <div class="list-group">
+            <% similarLostItems.forEach(item => { %>
+              <a href="/lost-items/<%= item.lost_item_id %>" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1"><%= item.item_name %></h6>
+                  <small><%= new Date(item.date_lost).toLocaleDateString() %></small>
+                </div>
+                <p class="mb-1 text-truncate"><%= item.description || 'No description provided.' %></p>
+                <small>Location: <%= item.location_lost %></small>
+              </a>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p class="text-muted text-center py-3">
+            <i class="fas fa-search mb-2 d-block" style="font-size: 2rem;"></i>
+            No similar lost items found.
+          </p>
+        <% } %>
+      </div>
+    </div>
+    
+    <div class="card mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">What's Next?</h5>
+      </div>
+      <div class="card-body">
+        <ul class="fa-ul mb-0">
+          <% if (foundItem.status === 'unclaimed') { %>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-search text-primary"></i></span>Check if this is your lost item</li>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-hand-holding text-success"></i></span>If it's yours, use the "This is My Item" button</li>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-clock text-warning"></i></span>Wait for admin approval of your claim</li>
+            <li><span class="fa-li"><i class="fas fa-map-marker-alt text-danger"></i></span>Once approved, pick up your item at the Lost & Found office</li>
+          <% } else { %>
+            <li class="mb-2"><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>This item has been claimed</li>
+            <li><span class="fa-li"><i class="fas fa-search text-primary"></i></span>Continue browsing other found items</li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Claim Modal -->
+<% if (locals.user && foundItem.status === 'unclaimed' && user.role !== 'admin') { %>
+  <div class="modal fade" id="claimModal" tabindex="-1" aria-labelledby="claimModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="claimModalLabel">Claim This Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/claims" method="POST">
+          <div class="modal-body">
+            <input type="hidden" name="found_item_id" value="<%= foundItem.found_item_id %>">
+            
+            <p>You are about to claim the item: <strong><%= foundItem.item_name %></strong></p>
+            
+            <div class="mb-3">
+              <label for="lostItemSelect" class="form-label">Link to Your Lost Item (Optional)</label>
+              <select class="form-select" id="lostItemSelect" name="lost_item_id">
+                <option value="">None - This is a direct claim</option>
+                <% if (userLostItems && userLostItems.length > 0) { %>
+                  <% userLostItems.forEach(item => { %>
+                    <option value="<%= item.lost_item_id %>"><%= item.item_name %> - Lost on <%= new Date(item.date_lost).toLocaleDateString() %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+              <div class="form-text">If you previously reported this item as lost, please select it from the list.</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="claimNotes" class="form-label">Additional Information</label>
+              <textarea class="form-control" id="claimNotes" name="claim_notes" rows="3" placeholder="Please provide any information that can help verify your ownership (e.g., identifying features, serial numbers, etc.)"></textarea>
+            </div>
+            
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle me-2"></i> Your claim will be reviewed by an administrator. You will be notified when your claim is approved or rejected.
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Submit Claim</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<%- include('partials/footer') %> 

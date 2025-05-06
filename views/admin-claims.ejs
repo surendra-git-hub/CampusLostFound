@@ -1,0 +1,91 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Admin Dashboard</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Manage Claims</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Manage Claims</h4>
+      </div>
+      <div class="card-body">
+        <% if (claims && claims.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Item</th>
+                  <th>Claimant</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% claims.forEach(claim => { %>
+                  <tr class="<% if (claim.status === 'pending') { %>table-warning<% } %>">
+                    <td>#<%= claim.claim_id %></td>
+                    <td>
+                      <% if (claim.lost_item_name) { %>
+                        <span class="badge bg-danger">Lost</span> <%= claim.lost_item_name %>
+                      <% } else if (claim.found_item_name) { %>
+                        <span class="badge bg-success">Found</span> <%= claim.found_item_name %>
+                      <% } %>
+                    </td>
+                    <td><%= claim.user_name || claim.claimed_by %></td>
+                    <td><%= new Date(claim.claim_date).toLocaleDateString() %></td>
+                    <td>
+                      <span class="badge rounded-pill 
+                        <% if (claim.status === 'pending') { %>bg-warning<% } 
+                        else if (claim.status === 'approved') { %>bg-success<% }
+                        else if (claim.status === 'rejected') { %>bg-danger<% }
+                        else { %>bg-secondary<% } %>">
+                        <%= claim.status.charAt(0).toUpperCase() + claim.status.slice(1) %>
+                      </span>
+                    </td>
+                    <td>
+                      <a href="/claims/<%= claim.claim_id %>" class="btn btn-sm btn-primary">View</a>
+                      
+                      <% if (claim.status === 'pending') { %>
+                        <div class="btn-group" role="group">
+                          <form action="/claims/<%= claim.claim_id %>/approve" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success">
+                              <i class="fas fa-check"></i> Approve
+                            </button>
+                          </form>
+                          <form action="/claims/<%= claim.claim_id %>/reject" method="POST" class="d-inline ms-1">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                              <i class="fas fa-times"></i> Reject
+                            </button>
+                          </form>
+                        </div>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5">
+            <i class="fas fa-clipboard-check fa-4x mb-3 text-muted"></i>
+            <h3>No Claims Found</h3>
+            <p class="text-muted">There are no claims in the system yet.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %> 

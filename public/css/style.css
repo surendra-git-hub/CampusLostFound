@@ -1,0 +1,192 @@
+/* Custom Styles for Campus Lost and Found */
+
+/* Main Colors */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section */
+.hero-section {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Item Lists */
+.item-list {
+    list-style: none;
+    padding: 0;
+}
+
+.item-card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.item-card:hover {
+    transform: translateY(-5px);
+}
+
+.item-image {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Category Badges */
+.category-badge {
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Status Indicators */
+.status-pending {
+    color: var(--warning-color);
+}
+
+.status-found,
+.status-approved {
+    color: var(--success-color);
+}
+
+.status-rejected {
+    color: var(--danger-color);
+}
+
+.status-unclaimed {
+    color: var(--info-color);
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+    }
+
+    .hero-section img {
+        margin-top: 20px;
+    }
+
+    .card-columns {
+        column-count: 1;
+    }
+}
+
+/* Item Details Page */
+.item-details-image {
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.matched-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Dashboard Cards */
+.dashboard-stat {
+    text-align: center;
+    padding: 20px;
+}
+
+.dashboard-stat i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-stat .counter {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+/* User Profile */
+.profile-header {
+    background-color: var(--light-color);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    margin: 0 auto 20px;
+}

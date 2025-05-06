@@ -1,0 +1,152 @@
+<%- include('partials/header') %>
+
+<div class="row mb-4">
+  <div class="col-12">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <% if (user && user.role === 'admin') { %>
+          <li class="breadcrumb-item"><a href="/admin/claims">Manage Claims</a></li>
+        <% } else { %>
+          <li class="breadcrumb-item"><a href="/users/dashboard">My Dashboard</a></li>
+        <% } %>
+        <li class="breadcrumb-item active" aria-current="page">Claim #<%= claim.claim_id %></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header 
+        <% if (claim.status === 'pending') { %>bg-warning<% } 
+        else if (claim.status === 'approved') { %>bg-success<% } 
+        else if (claim.status === 'rejected') { %>bg-danger<% } 
+        else { %>bg-secondary<% } %> text-white">
+        <h4 class="mb-0">Claim #<%= claim.claim_id %></h4>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <span class="badge rounded-pill 
+            <% if (claim.status === 'pending') { %>bg-warning<% } 
+            else if (claim.status === 'approved') { %>bg-success<% } 
+            else if (claim.status === 'rejected') { %>bg-danger<% } 
+            else { %>bg-secondary<% } %>">
+            Status: <%= claim.status.charAt(0).toUpperCase() + claim.status.slice(1) %>
+          </span>
+        </div>
+        
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th style="width: 150px;">Claimant</th>
+              <td><%= claim.user_name %> (<%= claim.user_email %>)</td>
+            </tr>
+            <tr>
+              <th>Claim Date</th>
+              <td><%= new Date(claim.claim_date).toLocaleDateString() %> <%= new Date(claim.claim_date).toLocaleTimeString() %></td>
+            </tr>
+            <% if (claim.lost_item_name) { %>
+            <tr>
+              <th>Lost Item</th>
+              <td>
+                <strong><%= claim.lost_item_name %></strong>
+                <p class="mt-2 mb-0"><%= claim.lost_item_description || 'No description provided.' %></p>
+              </td>
+            </tr>
+            <% } %>
+            <% if (claim.found_item_name) { %>
+            <tr>
+              <th>Found Item</th>
+              <td>
+                <strong><%= claim.found_item_name %></strong>
+                <p class="mt-2 mb-0"><%= claim.found_item_description || 'No description provided.' %></p>
+                <% if (claim.found_item_image) { %>
+                  <img src="<%= claim.found_item_image %>" alt="<%= claim.found_item_name %>" class="img-thumbnail mt-3" style="max-height: 200px;">
+                <% } %>
+              </td>
+            </tr>
+            <% } %>
+            <tr>
+              <th>Additional Notes</th>
+              <td><%= claim.claim_notes || 'No additional notes provided.' %></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <% if (user && user.role === 'admin' && claim.status === 'pending') { %>
+          <div class="mt-4 d-flex justify-content-between">
+            <form action="/claims/<%= claim.claim_id %>/reject" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-times-circle me-2"></i> Reject Claim
+              </button>
+            </form>
+            <form action="/claims/<%= claim.claim_id %>/approve" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-success">
+                <i class="fas fa-check-circle me-2"></i> Approve Claim
+              </button>
+            </form>
+          </div>
+        <% } else if (user && user.user_id === claim.user_id && claim.status === 'pending') { %>
+          <div class="mt-4">
+            <form action="/claims/<%= claim.claim_id %>/cancel" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-danger btn-delete">
+                <i class="fas fa-trash-alt me-2"></i> Cancel Claim
+              </button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <% if (claim.status === 'approved' && approvals && approvals.length > 0) { %>
+      <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">Approval Information</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Approved by:</strong> <%= approvals[0].admin_name %></p>
+          <p><strong>Approval Date:</strong> <%= new Date(approvals[0].approval_date).toLocaleDateString() %> <%= new Date(approvals[0].approval_date).toLocaleTimeString() %></p>
+          
+          <div class="alert alert-success mt-3">
+            <i class="fas fa-info-circle me-2"></i> This claim has been approved and processed. The item can be collected from the Lost & Found office.
+          </div>
+        </div>
+      </div>
+    <% } else if (claim.status === 'pending') { %>
+      <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Claim Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <i class="fas fa-hourglass-half me-2"></i> This claim is pending approval from an administrator.
+          </div>
+          
+          <% if (user && user.role !== 'admin') { %>
+            <p class="mt-3">An administrator will review your claim and approve or reject it based on the provided information.</p>
+            <p>You will be notified once a decision has been made.</p>
+          <% } %>
+        </div>
+      </div>
+    <% } else if (claim.status === 'rejected') { %>
+      <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">Claim Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-danger">
+            <i class="fas fa-times-circle me-2"></i> This claim has been rejected.
+          </div>
+          
+          <p class="mt-3">If you believe this is an error, please contact the Lost & Found office directly.</p>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %> 
